@@ -4,126 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ネットワークアラーム</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Material Components for the Webのスタイルとスクリプトを読み込む -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/13.0.0/material-components-web.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/13.0.0/material-components-web.min.js"></script>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Roboto', 'Noto', sans-serif;
             background-color: #f0f0f0;
             margin: 0;
             padding: 20px;
         }
-        .card {
-            background-color: #fff;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .alarm {
+            display: none;
             padding: 20px;
-            margin-bottom: 20px;
-        }
-        .title {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .button {
-            background-color: #2196F3;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #0d8ae4;
-        }
-        #logContainer {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 200px;
-            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid red;
+            background-color: #ffdddd;
+            color: red;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1 class="title">ネットワークアラーム</h1>
-        <div id="systemStartup" style="display: none;">音声ファイルを一時ファイルとして保存しています。</div>
-        <div id="networkAlarm" style="display: none;">ネットワークが切断されました！</div>
+    <h1 class="mdc-typography--headline1">ネットワークアラーム</h1>
+    <div id="networkAlarm" class="mdc-card alarm">
+        <div class="mdc-card__primary-action">
+            <div class="mdc-typography--body1">ネットワークが切断されました！</div>
+        </div>
     </div>
 
-    <div class="card">
-        <div id="logContainer"></div>
-        <button class="button" onclick="saveLog()">ログを保存</button>
+    <!-- プレビューボタン -->
+    <button class="mdc-button mdc-button--outlined" onclick="playPreview()">音声プレビュー</button>
+
+    <!-- システム起動画面 -->
+    <div id="startupScreen" class="mdc-card" style="display: none;">
+        <div class="mdc-card__primary-action">
+            <div class="mdc-typography--body1">音声ファイルを一時ファイルとして保存しています。</div>
+        </div>
     </div>
 
     <script>
-        const audioUrl = 'ara.mp3';
-        let audio = new Audio();
-        let audioBlobUrl = '';
-        let logContent = '';
-
-        // システム起動画面を表示
-        document.getElementById('systemStartup').style.display = 'block';
-
-        // ara.mp3をダウンロードして一時ファイルとして保存
-        fetch(audioUrl)
-            .then(response => response.blob())
-            .then(blob => {
-                audioBlobUrl = URL.createObjectURL(blob);
-                audio.src = audioBlobUrl;
-                audio.loop = false; // ループ再生しないように設定
-                audio.volume = 0; // 音量をゼロに設定
-                audio.play(); // 音声を一度だけ裏で再生
-
-                // システム起動画面を非表示
-                document.getElementById('systemStartup').style.display = 'none';
-
-                // ログに追加
-                logContent += '音声ファイルを一時ファイルとして保存しました。\n';
-                updateLog();
-            })
-            .catch(error => {
-                console.error('音声ファイルの保存中にエラーが発生しました:', error);
-                logContent += '音声ファイルの保存中にエラーが発生しました。\n';
-                updateLog();
-            });
+        var audio = new Audio('ara.mp3');
+        var offlineLoop;
 
         function updateNetworkStatus() {
             var networkAlarm = document.getElementById('networkAlarm');
             if (navigator.onLine) {
                 networkAlarm.style.display = 'none';
-                if (!audio.paused) {
-                    audio.pause();
-                }
-                logContent += 'ネットワークがオンラインに復旧しました。\n';
-                updateLog();
+                audio.pause();
+                clearInterval(offlineLoop);
             } else {
                 networkAlarm.style.display = 'block';
-                if (audio.paused) {
+                audio.play();
+                offlineLoop = setInterval(function() {
                     audio.play();
-                }
-                logContent += 'ネットワークが切断されました。\n';
-                updateLog();
+                }, audio.duration * 1000); // ループ再生
             }
         }
-
-        function updateLog() {
-            document.getElementById('logContainer').innerText = logContent;
-        }
-
-        function saveLog() {
-            const blob = new Blob([logContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'network_log.txt';
-            a.click();
-        }
-
-        // 音声再生が完了したら音量を100に設定
-        audio.addEventListener('ended', function() {
-            audio.volume = 1; // 音量を100に設定
-        });
 
         // 初期状態の確認
         updateNetworkStatus();
@@ -131,6 +67,16 @@
         // ネットワーク状態の変更を監視
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
+
+        // 音声プレビュー
+        function playPreview() {
+            var startupScreen = document.getElementById('startupScreen');
+            startupScreen.style.display = 'block';
+            audio.play();
+            setTimeout(function() {
+                startupScreen.style.display = 'none';
+            }, audio.duration * 1000);
+        }
     </script>
 </body>
 </html>
