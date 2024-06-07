@@ -26,42 +26,49 @@
 </head>
 <body>
     <h1 class="mdc-typography--headline1">ネットワークアラーム</h1>
-    <div id="networkAlarm" class="mdc-card alarm">
-        <div class="mdc-card__primary-action">
-            <div class="mdc-typography--body1">ネットワークが切断されました！</div>
-        </div>
-    </div>
-
-    <!-- 音声プレビューボタン -->
-    <button id="previewButton" class="mdc-button mdc-button--outlined">音声プレビュー</button>
 
     <!-- システム起動画面 -->
-    <div id="startupScreen" class="mdc-card" style="display: none;">
+    <div id="startupScreen" class="mdc-card">
         <div class="mdc-card__primary-action">
-            <div class="mdc-typography--body1">音声ファイルを一時ファイルとして保存しています。</div>
+            <div class="mdc-typography--body1">起動中...</div>
         </div>
     </div>
 
+    <!-- プレビューボタン -->
+    <button class="mdc-button mdc-button--outlined" onclick="playPreview()">音声プレビュー</button>
+
     <script>
-        var audio;
+        var audio = new Audio('ara.mp3');
+        var offlineLoop;
 
-        // 音声ファイルを一時ファイルとして保存
-        function saveAudio() {
-            audio = new Audio('ara.mp3');
-        }
+        // 起動時の処理
+        window.onload = function() {
+            // 起動画面を非表示にする
+            var startupScreen = document.getElementById('startupScreen');
+            startupScreen.style.display = 'none';
+            // ara.mp3をロードし、一時ファイルとして保存
+            audio.addEventListener('loadeddata', function() {
+                console.log('ara.mp3がロードされました。');
+            });
+            audio.load();
+        };
 
-        // ネットワークの状態を監視してアラームを表示
         function updateNetworkStatus() {
             var networkAlarm = document.getElementById('networkAlarm');
             if (navigator.onLine) {
                 networkAlarm.style.display = 'none';
+                audio.pause();
+                clearInterval(offlineLoop);
             } else {
                 networkAlarm.style.display = 'block';
+                audio.play();
+                offlineLoop = setInterval(function() {
+                    audio.play();
+                }, audio.duration * 1000); // ループ再生
             }
         }
 
         // 初期状態の確認
-        saveAudio();
         updateNetworkStatus();
 
         // ネットワーク状態の変更を監視
@@ -69,14 +76,13 @@
         window.addEventListener('offline', updateNetworkStatus);
 
         // 音声プレビュー
-        document.getElementById('previewButton').addEventListener('click', function() {
+        function playPreview() {
+            // 起動画面を非表示にする
             var startupScreen = document.getElementById('startupScreen');
-            startupScreen.style.display = 'block';
+            startupScreen.style.display = 'none';
+            // 音声を再生する
             audio.play();
-            setTimeout(function() {
-                startupScreen.style.display = 'none';
-            }, audio.duration * 1000);
-        });
+        }
     </script>
 </body>
 </html>
