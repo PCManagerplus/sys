@@ -3,47 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 Error</title>
+    <title>403 Forbidden</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0; /* デバイスのテーマに合わせた背景色 */
+            background-color: #f4f4f4;
+            color: #333;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-        }
-        .error-container {
             text-align: center;
         }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
         h1 {
-            color: #333; /* デバイスのテーマに合わせたテキストの色 */
+            margin-top: 0;
         }
         p {
-            color: #666; /* デバイスのテーマに合わせたテキストの色 */
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="error-container">
+    <div class="container">
         <h1>403 Forbidden</h1>
-        <p>アクセスが拒否されました。</p>
+        <p>お探しのページにアクセスする権限がありません。</p>
+        <p>理由:編集者はこのページのアクセスを制限しています。</p>
+        <!-- 音声ファイルの自動再生 -->
+        <audio src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" controls style="display: none;" autoplay>
+            お使いのブラウザはaudio要素をサポートしていません。
+        </audio>
     </div>
-
-    <script>
-        // 音声ファイルのURL
-        var audioUrl = 'https://pcmanagerplus.github.io/media.web/er.mp3';
-
-        // 音声を再生する関数
-        function playErrorSound(url) {
-            var audio = new Audio(url);
-            audio.play();
-        }
-
-        // ページ読み込み時に音声を再生
-        playErrorSound(audioUrl);
-    </script>
 </body>
 </html>
