@@ -38,21 +38,12 @@
 
         // 音声を再生する関数
         function playErrorSound(url) {
-            fetch(url)
-                .then(response => response.blob())
-                .then(blob => {
-                    var audio = new Audio(URL.createObjectURL(blob));
-                    audio.play();
-                })
-                .catch(error => {
-                    console.error('音声の再生中にエラーが発生しました:', error);
-                });
+            var audio = new Audio(url);
+            audio.play();
         }
 
         // ページ読み込み時に音声を再生
-        window.addEventListener('load', function() {
-            playErrorSound(audioUrl);
-        });
+        playErrorSound(audioUrl);
     </script>
 </body>
 </html>
