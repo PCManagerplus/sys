@@ -53,27 +53,23 @@
             audio.load();
         };
 
+        // ネットワークステータスの定期チェック
+        setInterval(updateNetworkStatus, 1000);
+
         function updateNetworkStatus() {
             var networkAlarm = document.getElementById('networkAlarm');
-            if (navigator.onLine) {
-                networkAlarm.style.display = 'none';
-                audio.pause();
-                clearInterval(offlineLoop);
-            } else {
+            if (!navigator.onLine) {
                 networkAlarm.style.display = 'block';
                 audio.play();
                 offlineLoop = setInterval(function() {
                     audio.play();
                 }, audio.duration * 1000); // ループ再生
+            } else {
+                networkAlarm.style.display = 'none';
+                audio.pause();
+                clearInterval(offlineLoop);
             }
         }
-
-        // 初期状態の確認
-        updateNetworkStatus();
-
-        // ネットワーク状態の変更を監視
-        window.addEventListener('online', updateNetworkStatus);
-        window.addEventListener('offline', updateNetworkStatus);
 
         // 音声プレビュー
         function playPreview() {
