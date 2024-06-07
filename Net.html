@@ -84,7 +84,6 @@
                 if (!audio.paused) {
                     audio.pause();
                 }
-                audio.volume = 1; // オンラインになったら音量を100に戻す
                 logContent += 'ネットワークがオンラインに復旧しました。\n';
                 updateLog();
             } else {
@@ -109,6 +108,11 @@
             a.download = 'network_log.txt';
             a.click();
         }
+
+        // 音声再生が完了したら音量を100に設定
+        audio.addEventListener('ended', function() {
+            audio.volume = 1; // 音量を100に設定
+        });
 
         // 初期状態の確認
         updateNetworkStatus();
