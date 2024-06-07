@@ -48,7 +48,9 @@
             .then(blob => {
                 audioBlobUrl = URL.createObjectURL(blob);
                 audio.src = audioBlobUrl;
-                audio.loop = true;
+                audio.loop = false; // ループ再生しないように設定
+                audio.volume = 0; // 音量をゼロに設定
+                audio.play(); // 音声を一度だけ裏で再生
                 
                 // システム起動画面を非表示
                 document.getElementById('systemStartup').style.display = 'none';
