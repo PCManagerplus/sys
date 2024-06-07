@@ -4,43 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ネットワークアラーム</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-        #systemStartup {
-            display: none;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid blue;
-            background-color: #ddeeff;
-            color: blue;
-        }
-        #networkAlarm {
-            display: none;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid red;
-            background-color: #ffdddd;
-            color: red;
-        }
-    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 </head>
 <body>
-    <h1>ネットワークアラーム</h1>
-    <div id="systemStartup">音声ファイルを一時ファイルとして保存しています。</div>
-    <div id="networkAlarm">ネットワークが切断されました！</div>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout-title">ネットワークアラーム</span>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Menu</span>
+            <nav class="mdl-navigation">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="saveLog()">ログを保存</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="playPreview()">音声プレビュー</button>
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--12-col">
+                        <div id="systemStartup" class="mdl-card mdl-shadow--2dp" style="display: none;">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">システム起動画面</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                音声ファイルを一時ファイルとして保存しています。
+                            </div>
+                        </div>
+                        <div id="networkAlarm" class="mdl-card mdl-shadow--2dp" style="display: none;">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">ネットワークが切断されました！</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                インターネット接続がありません。ネットワークの状態を確認してください。
+                            </div>
+                        </div>
+                        <div id="logContainer" class="mdl-card mdl-shadow--2dp" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
         const audioUrl = 'ara.mp3';
         let audio = new Audio();
         let audioBlobUrl = '';
-
-        // システム起動画面を表示
-        document.getElementById('systemStartup').style.display = 'block';
+        let logContent = '';
 
         // ara.mp3をダウンロードして一時ファイルとして保存
         fetch(audioUrl)
@@ -50,13 +63,18 @@
                 audio.src = audioBlobUrl;
                 audio.loop = false; // ループ再生しないように設定
                 audio.volume = 0; // 音量をゼロに設定
-                audio.play(); // 音声を一度だけ裏で再生
-                
+
                 // システム起動画面を非表示
                 document.getElementById('systemStartup').style.display = 'none';
+
+                // ログに追加
+                logContent += '音声ファイルを一時ファイルとして保存しました。\n';
+                updateLog();
             })
             .catch(error => {
                 console.error('音声ファイルの保存中にエラーが発生しました:', error);
+                logContent += '音声ファイルの保存中にエラーが発生しました。\n';
+                updateLog();
             });
 
         function updateNetworkStatus() {
@@ -66,12 +84,34 @@
                 if (!audio.paused) {
                     audio.pause();
                 }
+                logContent += 'ネットワークがオンラインに復旧しました。\n';
+                updateLog();
             } else {
                 networkAlarm.style.display = 'block';
                 if (audio.paused) {
                     audio.play();
                 }
+                logContent += 'ネットワークが切断されました。\n';
+                updateLog();
             }
+        }
+
+        function updateLog() {
+            document.getElementById('logContainer').innerText = logContent;
+        }
+
+        function saveLog() {
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'network_log.txt';
+            a.click();
+        }
+
+        function playPreview() {
+            audio.currentTime = 0;
+            audio.play();
         }
 
         // 初期状態の確認
@@ -80,6 +120,7 @@
         // ネットワーク状態の変更を監視
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
-    </script>
+</script>
+
 </body>
 </html>
