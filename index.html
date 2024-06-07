@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* デバイスのテーマに合わせた背景色 */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .error-container {
+            text-align: center;
+        }
+        h1 {
+            color: #333; /* デバイスのテーマに合わせたテキストの色 */
+        }
+        p {
+            color: #666; /* デバイスのテーマに合わせたテキストの色 */
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>403 Forbidden</h1>
+        <p>アクセスが拒否されました。</p>
+    </div>
+
+    <script>
+        // 音声ファイルのURL
+        var audioUrl = 'https://pcmanagerplus.github.io/media.web/er.mp3';
+
+        // 音声を再生する関数
+        function playErrorSound(url) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    var audio = new Audio(URL.createObjectURL(blob));
+                    audio.play();
+                })
+                .catch(error => {
+                    console.error('音声の再生中にエラーが発生しました:', error);
+                });
+        }
+
+        // ページ読み込み時に音声を再生
+        window.addEventListener('load', function() {
+            playErrorSound(audioUrl);
+        });
+    </script>
+</body>
+</html>
