@@ -30,17 +30,26 @@
         p {
             margin-bottom: 20px;
         }
+        audio {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>403 Forbidden</h1>
         <p>お探しのページにアクセスする権限がありません。</p>
-        <p>理由:編集者はこのページのアクセスを制限しています。</p>
-        <!-- 音声ファイルの自動再生 -->
-        <audio src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" controls style="display: none;" autoplay>
-            お使いのブラウザはaudio要素をサポートしていません。
-        </audio>
+        <p>問題が解決しない場合は、サポートにお問い合わせください。</p>
     </div>
+    <audio id="errorSound" preload="auto">
+        <source src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+    <script>
+        window.addEventListener('load', function() {
+            var audio = document.getElementById('errorSound');
+            audio.play();
+        });
+    </script>
 </body>
 </html>
