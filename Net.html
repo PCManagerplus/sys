@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ネットワークアラーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #systemStartup {
+            display: none;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid blue;
+            background-color: #ddeeff;
+            color: blue;
+        }
+        #networkAlarm {
+            display: none;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid red;
+            background-color: #ffdddd;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>ネットワークアラーム</h1>
+    <div id="systemStartup">音声ファイルを一時ファイルとして保存しています。</div>
+    <div id="networkAlarm">ネットワークが切断されました！</div>
+
+    <script>
+        const audioUrl = 'ara.mp3';
+        let audio = new Audio();
+        let audioBlobUrl = '';
+
+        // システム起動画面を表示
+        document.getElementById('systemStartup').style.display = 'block';
+
+        // ara.mp3をダウンロードして一時ファイルとして保存
+        fetch(audioUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                audioBlobUrl = URL.createObjectURL(blob);
+                audio.src = audioBlobUrl;
+                audio.loop = true;
+                
+                // システム起動画面を非表示
+                document.getElementById('systemStartup').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('音声ファイルの保存中にエラーが発生しました:', error);
+            });
+
+        function updateNetworkStatus() {
+            var networkAlarm = document.getElementById('networkAlarm');
+            if (navigator.onLine) {
+                networkAlarm.style.display = 'none';
+                if (!audio.paused) {
+                    audio.pause();
+                }
+            } else {
+                networkAlarm.style.display = 'block';
+                if (audio.paused) {
+                    audio.play();
+                }
+            }
+        }
+
+        // 初期状態の確認
+        updateNetworkStatus();
+
+        // ネットワーク状態の変更を監視
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+    </script>
+</body>
+</html>
