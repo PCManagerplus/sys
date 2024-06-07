@@ -36,7 +36,7 @@
     </style>
 </head>
 <body>
-    <audio id="errorSound" autoplay>
+    <audio id="errorSound">
         <source src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" type="audio/ogg">
         Your browser does not support the audio element.
     </audio>
@@ -45,5 +45,22 @@
         <p>お探しのページにアクセスする権限がありません。</p>
         <p>問題が解決しない場合は、サポートにお問い合わせください。</p>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var audio = document.getElementById('errorSound');
+            var playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    console.log('Audio played automatically');
+                }).catch(function(error) {
+                    console.log('Audio playback failed:', error);
+                    document.addEventListener('click', function() {
+                        audio.play();
+                    }, { once: true });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
