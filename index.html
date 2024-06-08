@@ -60,10 +60,16 @@
         <p>アクセスが拒否されました。このページにアクセスする権限がありません。</p>
         <a class="btn" href="https://www.google.com/">Googleに戻る</a>
     </div>
-    <audio autoplay loop>
+    <audio id="errorSound" autoplay loop>
         <source src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" type="audio/ogg">
         お使いのブラウザはオーディオ要素をサポートしていません。
     </audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var audio = document.getElementById('errorSound');
+            audio.volume = 1.0; // 音量を100%に設定
+        });
+    </script>
 </body>
 </html>
