@@ -1,69 +1,64 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>403 Forbidden</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            text-align: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .container {
-            max-width: 600px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
         h1 {
-            margin-top: 0;
+            font-size: 2em;
+            margin-bottom: 20px;
         }
         p {
             margin-bottom: 20px;
         }
-        audio {
-            display: none;
+
+        /* ダークテーマ */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #424242;
+                color: #fff;
+            }
+            a {
+                color: #90caf9;
+            }
+        }
+
+        /* ホワイトテーマ */
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #f7f7f7;
+                color: #000;
+            }
+            a {
+                color: #1e88e5;
+            }
         }
     </style>
 </head>
 <body>
-    <audio id="errorSound">
+    <div class="container">
+        <h1>403 Forbidden</h1>
+        <p>アクセスが拒否されました。このページにアクセスする権限がありません。</p>
+        <a class="btn" href="https://www.google.com/">Googleに戻る</a>
+    </div>
+    <audio autoplay loop>
         <source src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" type="audio/ogg">
         Your browser does not support the audio element.
     </audio>
-    <div class="container">
-        <h1>403 Forbidden</h1>
-        <p>お探しのページにアクセスする権限がありません。</p>
-        <p>問題が解決しない場合は、サポートにお問い合わせください。</p>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var audio = document.getElementById('errorSound');
-            var hasPlayed = false;
-
-            var playAudio = function() {
-                if (!hasPlayed) {
-                    audio.play().then(function() {
-                        console.log('Audio played successfully');
-                    }).catch(function(error) {
-                        console.log('Audio playback failed:', error);
-                    });
-                    hasPlayed = true;
-                    document.removeEventListener('mousemove', playAudio);
-                }
-            };
-
-            document.addEventListener('mousemove', playAudio);
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
