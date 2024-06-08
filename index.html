@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@
             }
         }
 
-        /* ホワイトテーマ */
+        /* ライトテーマ */
         @media (prefers-color-scheme: light) {
             body {
                 background-color: #f7f7f7;
@@ -46,6 +46,11 @@
             a {
                 color: #1e88e5;
             }
+        }
+
+        /* 音声要素を非表示に */
+        audio {
+            display: none;
         }
     </style>
 </head>
@@ -57,7 +62,7 @@
     </div>
     <audio autoplay loop>
         <source src="https://pcmanagerplus.github.io/media.web/LowBattery.ogg" type="audio/ogg">
-        Your browser does not support the audio element.
+        お使いのブラウザはオーディオ要素をサポートしていません。
     </audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
