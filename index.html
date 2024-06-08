@@ -1,82 +1,26 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>403 Forbidden</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .container {
-            text-align: center;
-        }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-        p {
-            margin-bottom: 20px;
-        }
-
-        /* ダークテーマ */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #424242;
-                color: #fff;
-            }
-            a {
-                color: #90caf9;
-            }
-        }
-
-        /* ライトテーマ */
-        @media (prefers-color-scheme: light) {
-            body {
-                background-color: #f7f7f7;
-                color: #000;
-            }
-            a {
-                color: #1e88e5;
-            }
-        }
-
-        /* 音声要素を非表示に */
-        audio {
-            display: none;
-        }
-    </style>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>403 Forbidden</h1>
-        <p>アクセスが拒否されました。このページにアクセスする権限がありません。</p>
-        <a class="btn" href="https://www.google.com/">Googleに戻る</a>
+<body class="red lighten-2">
+    <div class="container center-align">
+        <h1 class="white-text">403 Forbidden</h1>
+        <p class="white-text">アクセスが拒否されました。このページにアクセスする権限がありません。</p>
+        <a href="https://www.google.com/" class="waves-effect waves-light btn white red-text">Googleに戻る</a>
     </div>
-    <audio id="errorSound" loop>
+    <audio autoplay loop>
         <source src="https://pcmanagerplus.github.io/media.web/LowBattery.mp3" type="audio/mpeg">
-        お使いのブラウザはオーディオ要素をサポートしていません。
+        Your browser does not support the audio element.
     </audio>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var audio = document.getElementById('errorSound');
 
-            // 音声ファイルの読み込みが完了した時に実行
-            audio.addEventListener('canplaythrough', function() {
-                setTimeout(function() {
-                    audio.volume = 1.0; // 音量を100%に設定
-                    audio.play(); // 音声を再生
-                }, 500); // 0.5秒待ってから実行
-            });
-        });
-    </script>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
