@@ -19,7 +19,7 @@
         }
         #marquee {
             white-space: nowrap;
-            animation: marquee 10s linear infinite;
+            will-change: transform;
         }
         @keyframes marquee {
             0% { transform: translateX(100%); }
@@ -33,8 +33,10 @@
         function loadMessage() {
             const message = localStorage.getItem('message') || 'ここにメッセージが表示されます';
             const color = localStorage.getItem('color') || '#ffffff';
+            const speed = localStorage.getItem('speed') || 10;
             const marquee = document.getElementById('marquee');
             marquee.innerHTML = applyColors(message, color);
+            marquee.style.animation = `marquee ${speed}s linear infinite`;
         }
 
         function applyColors(message, color) {
