@@ -7,20 +7,25 @@
     <style>
         body {
             margin: 0;
-            display: flex;
-            align-items: center;
-            height: 100vh;
             background-color: #000;
             color: #fff;
             font-size: 2em;
             font-family: 'Courier New', Courier, monospace;
             overflow: hidden;
         }
+        #marquee-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
         #marquee {
             white-space: nowrap;
             will-change: transform;
             position: absolute;
-            animation: marquee linear infinite;
         }
         @keyframes marquee {
             0% { transform: translateX(100%); }
@@ -29,7 +34,9 @@
     </style>
 </head>
 <body>
-    <div id="marquee"></div>
+    <div id="marquee-container">
+        <div id="marquee"></div>
+    </div>
     <script>
         function loadMessage() {
             const message = localStorage.getItem('message') || 'ここにメッセージが表示されます';
@@ -37,7 +44,7 @@
             const speed = localStorage.getItem('speed') || 10;
             const marquee = document.getElementById('marquee');
             marquee.innerHTML = applyColors(message, color);
-            marquee.style.animationDuration = `${speed}s`;
+            marquee.style.animation = `marquee ${speed}s linear infinite`;
         }
 
         function applyColors(message, color) {
