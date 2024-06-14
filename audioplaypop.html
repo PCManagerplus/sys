@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放送システム</title>
+    <!-- Materialize CSS CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">放送システム</h1>
+
+        <!-- トグルスイッチ -->
+        <div class="switch">
+            <label>
+                マイクOFF
+                <input type="checkbox" id="micToggle" onclick="toggleMic()">
+                <span class="lever"></span>
+                マイクON
+            </label>
+        </div>
+
+        <br><br>
+
+        <!-- ボタン -->
+        <div class="row">
+            <div class="col s3">
+                <button class="btn waves-effect waves-light" onclick="playSound('https://pcmanagerplus.github.io/media.web/Original/1/4up.m4a')">上り</button>
+            </div>
+            <div class="col s3">
+                <button class="btn waves-effect waves-light" onclick="playSound('https://pcmanagerplus.github.io/media.web/Original/1/4down.m4a')">下り</button>
+            </div>
+            <div class="col s3">
+                <button class="btn waves-effect waves-light" onclick="playSound('https://pcmanagerplus.github.io/media.web/Original/1/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A01.m4a')">チャイム1</button>
+            </div>
+            <div class="col s3">
+                <button class="btn waves-effect waves-light" onclick="playSound('https://pcmanagerplus.github.io/media.web/Original/1/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A02.m4a')">チャイム2</button>
+            </div>
+        </div>
+
+        <br><br>
+
+        <!-- 出力デバイス選択 -->
+        <div class="input-field col s12">
+            <select id="audioOutput">
+                <option value="" disabled selected>出力デバイスを選択</option>
+            </select>
+            <label>出力デバイス</label>
+        </div>
+
+        <br><br>
+
+        <!-- マイクデバイス選択 -->
+        <div class="input-field col s12">
+            <select id="audioInput">
+                <option value="" disabled selected>マイクデバイスを選択</option>
+            </select>
+            <label>マイクデバイス</label>
+        </div>
+    </div>
+
+    <!-- Materialize JS & jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let elems = document.querySelectorAll('select');
+            M.FormSelect.init(elems);
+        });
+
+        let audioContext;
+        let mediaStreamSource;
+        let mediaStream;
+        let micToggle = document.getElementById('micToggle');
+        let audioOutputSelect = document.getElementById('audioOutput');
+        let audioInputSelect = document.getElementById('audioInput');
+
+        // マイクのオンオフを切り替える
+        function toggleMic() {
+            if (micToggle.checked) {
+                startMic();
+            } else {
+                stopMic();
+            }
+        }
+
+        // マイクを開始する
+        async function startMic() {
+            const constraints = {
+                audio: {
+                    deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined
+                }
+            };
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+            mediaStreamSource.connect(audioContext.destination);
+        }
+
+        // マイクを停止する
+        function stopMic() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext) {
+                audioContext.close();
+            }
+        }
+
+        // 音声を再生する
+        function playSound(url) {
+            let audio = new Audio(url);
+            let selectedDeviceId = audioOutputSelect.value;
+
+            if (selectedDeviceId) {
+                audio.setSinkId(selectedDeviceId).then(() => {
+                    audio.play();
+                }).catch(err => {
+                    console.error('Error setting sink ID:', err);
+                    audio.play(); // デバイス指定に失敗した場合でも音を出す
+                });
+            } else {
+                audio.play();
+            }
+        }
+
+        // 入出力デバイスをリストに表示する
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            devices.forEach(device => {
+                if (device.kind === 'audiooutput') {
+                    let option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `出力デバイス ${audioOutputSelect.length + 1}`;
+                    audioOutputSelect.appendChild(option);
+                } else if (device.kind === 'audioinput') {
+                    let option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `マイクデバイス ${audioInputSelect.length + 1}`;
+                    audioInputSelect.appendChild(option);
+                }
+            });
+
+            // 再初期化
+            let elems = document.querySelectorAll('select');
+            M.FormSelect.init(elems);
+        }).catch(err => {
+            console.error('Error enumerating devices:', err);
+        });
+    </script>
+</body>
+</html>
