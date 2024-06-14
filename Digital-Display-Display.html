@@ -8,7 +8,6 @@
         body {
             margin: 0;
             display: flex;
-            justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #000;
@@ -20,6 +19,8 @@
         #marquee {
             white-space: nowrap;
             will-change: transform;
+            position: absolute;
+            animation: marquee linear infinite;
         }
         @keyframes marquee {
             0% { transform: translateX(100%); }
@@ -36,7 +37,7 @@
             const speed = localStorage.getItem('speed') || 10;
             const marquee = document.getElementById('marquee');
             marquee.innerHTML = applyColors(message, color);
-            marquee.style.animation = `marquee ${speed}s linear infinite`;
+            marquee.style.animationDuration = `${speed}s`;
         }
 
         function applyColors(message, color) {
