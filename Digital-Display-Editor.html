@@ -24,10 +24,14 @@
             padding: 10px;
             font-size: 16px;
         }
-        input[type="color"] {
+        .input-field {
+            margin-bottom: 20px;
+        }
+        .input-field input[type="color"] {
             width: 50px;
             height: 30px;
             padding: 0;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -41,6 +45,10 @@
         <div class="input-field">
             <label for="color">部分的な文字の色を選択:</label>
             <input type="color" id="color">
+        </div>
+        <div class="input-field">
+            <label for="speed">スクロール速度 (秒):</label>
+            <input type="number" id="speed" min="1" value="10">
         </div>
         <button class="btn waves-effect waves-light" onclick="saveMessage()">保存
             <i class="material-icons right">save</i>
@@ -72,8 +80,10 @@
         function saveMessage() {
             const message = document.getElementById('message').value;
             const color = document.getElementById('color').value;
+            const speed = document.getElementById('speed').value;
             localStorage.setItem('message', message);
             localStorage.setItem('color', color);
+            localStorage.setItem('speed', speed);
             M.toast({html: 'メッセージが保存されました！'});
         }
 
@@ -90,15 +100,19 @@
             window.open('Digital-Display-Display.html', 'popup', 'width=800,height=600');
         }
 
-        // ページ読み込み時に保存されたメッセージとカラーを表示
+        // ページ読み込み時に保存されたメッセージ、カラー、速度を表示
         window.onload = function() {
             const savedMessage = localStorage.getItem('message');
             const savedColor = localStorage.getItem('color');
+            const savedSpeed = localStorage.getItem('speed');
             if (savedMessage) {
                 document.getElementById('message').value = savedMessage;
             }
             if (savedColor) {
                 document.getElementById('color').value = savedColor;
+            }
+            if (savedSpeed) {
+                document.getElementById('speed').value = savedSpeed;
             }
         }
     </script>
