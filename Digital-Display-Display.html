@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電光掲示板 - 表示</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-size: 2em;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+        #marquee {
+            white-space: nowrap;
+            animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <div id="marquee"></div>
+    <script>
+        function loadMessage() {
+            const message = localStorage.getItem('message') || 'ここにメッセージが表示されます';
+            const color = localStorage.getItem('color') || '#ffffff';
+            const marquee = document.getElementById('marquee');
+            marquee.innerHTML = applyColors(message, color);
+        }
+
+        function applyColors(message, color) {
+            return message.replace(/"(.*?)"/g, `<span style="color: ${color}">$1</span>`);
+        }
+
+        window.onload = loadMessage;
+    </script>
+</body>
+</html>
