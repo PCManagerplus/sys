@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タッチで音を鳴らす</title>
+</head>
+<body>
+    <h1>ページ全体をタッチすると音が鳴ります</h1>
+    <!-- オーディオファイルをロード -->
+    <audio id="sound" src="sound.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // オーディオ要素を取得
+            const sound = document.getElementById('sound');
+
+            // タッチイベントリスナーを設定
+            document.body.addEventListener('touchstart', () => {
+                // 音を再生
+                sound.play();
+            });
+        });
+    </script>
+</body>
+</html>
