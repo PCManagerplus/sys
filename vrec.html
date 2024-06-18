@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ボイスレコーダー</title>
+    <style>
+        #recordButton, #stopButton {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+        #recordButton {
+            background-color: red;
+        }
+        #stopButton {
+            background-color: grey;
+            border-radius: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>ボイスレコーダー</h1>
+    <button id="recordButton"></button>
+    <button id="stopButton"></button>
+
+    <audio id="startSound" src="https://pcmanagerplus.github.io/media.web/Rec%20start.m4a"></audio>
+    <audio id="stopSound" src="https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a"></audio>
+
+    <script>
+        let recordButton = document.getElementById('recordButton');
+        let stopButton = document.getElementById('stopButton');
+        let startSound = document.getElementById('startSound');
+        let stopSound = document.getElementById('stopSound');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        recordButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+
+        async function startRecording() {
+            startSound.play();
+            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.start();
+            recordButton.style.display = 'none';
+            stopButton.style.display = 'block';
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            stopSound.play();
+            mediaRecorder.onstop = () => {
+                let audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                let audioUrl = URL.createObjectURL(audioBlob);
+                let audio = new Audio(audioUrl);
+                audio.play();
+                audioChunks = [];
+            };
+            stopButton.style.display = 'none';
+            recordButton.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
