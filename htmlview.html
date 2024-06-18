@@ -7,14 +7,10 @@
     <!-- Materialize CSS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
-        body {
-            padding: 20px;
-        }
-        .textarea-container {
-            margin-bottom: 20px;
-        }
-        .hidden {
-            display: none;
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
         }
         .full-preview {
             margin: 0;
@@ -23,60 +19,22 @@
         .full-preview iframe {
             height: 100vh;
         }
-
-        /* デバイスのテーマに基づくスタイル */
-        @media (prefers-color-scheme: dark) {
-            body:not(.force-light-theme) {
-                background-color: #121212;
-                color: #ffffff;
-            }
-            textarea:not(.force-light-theme) {
-                background-color: #333;
-                color: #fff;
-                border-color: #555;
-            }
-        }
-        @media (prefers-color-scheme: light) {
-            body:not(.force-light-theme) {
-                background-color: #ffffff;
-                color: #000000;
-            }
-            textarea:not(.force-light-theme) {
-                background-color: #fff;
-                color: #000;
-                border-color: #ccc;
-            }
-        }
-
-        /* ホワイトテーマ固定 */
-        .force-light-theme {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-        }
-        .force-light-theme textarea {
-            background-color: #fff !important;
-            color: #000 !important;
-            border-color: #ccc !important;
-        }
     </style>
 </head>
 <body>
-    <div id="editorSection" class="container">
+    <div class="container" id="editorSection">
         <h1 class="center-align">HTMLプレビュー</h1>
-        <div class="row textarea-container">
+        <div class="row">
             <div class="input-field col s12">
                 <textarea id="htmlInput" class="materialize-textarea" placeholder="ここにHTMLコードを入力してください"></textarea>
-                <label for="htmlInput">HTMLコード</label>
             </div>
-        </div>
-        <div class="row">
             <div class="col s12 center-align">
                 <button class="btn waves-effect waves-light" onclick="previewHTML()">プレビュー</button>
             </div>
         </div>
     </div>
 
-    <!-- Materialize JS and dependencies -->
+    <!-- Materialize JavaScript and dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         function getQueryParams() {
@@ -100,14 +58,14 @@
             );
 
             if (!popupWindow) {
-                M.toast({html: 'ポップアップウィンドウがブロックされました。ポップアップを許可してください。'});
+                alert('ポップアップウィンドウがブロックされました。ポップアップを許可してください。');
             }
         }
 
         window.onload = function() {
             const params = getQueryParams();
             if (params.viewhtml !== undefined) {
-                document.body.classList.add('full-preview', 'force-light-theme');
+                document.body.classList.add('full-preview');
                 document.getElementById('editorSection').classList.add('hidden');
 
                 // iframeに直接HTMLを入れる
