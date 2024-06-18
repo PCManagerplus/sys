@@ -13,10 +13,55 @@
         .textarea-container {
             margin-bottom: 20px;
         }
+        .hidden {
+            display: none;
+        }
+        .full-preview {
+            margin: 0;
+            padding: 0;
+        }
+        .full-preview iframe {
+            height: 100vh;
+        }
+
+        /* デバイスのテーマに基づくスタイル */
+        @media (prefers-color-scheme: dark) {
+            body:not(.force-light-theme) {
+                background-color: #121212;
+                color: #ffffff;
+            }
+            textarea:not(.force-light-theme) {
+                background-color: #333;
+                color: #fff;
+                border-color: #555;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            body:not(.force-light-theme) {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            textarea:not(.force-light-theme) {
+                background-color: #fff;
+                color: #000;
+                border-color: #ccc;
+            }
+        }
+
+        /* ホワイトテーマ固定 */
+        .force-light-theme {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        .force-light-theme textarea {
+            background-color: #fff !important;
+            color: #000 !important;
+            border-color: #ccc !important;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="editorSection" class="container">
         <h1 class="center-align">HTMLプレビュー</h1>
         <div class="row textarea-container">
             <div class="input-field col s12">
@@ -62,8 +107,8 @@
         window.onload = function() {
             const params = getQueryParams();
             if (params.viewhtml !== undefined) {
-                document.body.classList.add('full-preview');
-                document.querySelector('.container').classList.add('hidden');
+                document.body.classList.add('full-preview', 'force-light-theme');
+                document.getElementById('editorSection').classList.add('hidden');
 
                 // iframeに直接HTMLを入れる
                 const iframe = document.createElement('iframe');
