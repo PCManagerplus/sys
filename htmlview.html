@@ -7,17 +7,16 @@
     <!-- Materialize CSS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
-        iframe {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
             width: 100%;
-            height: 300px;
-            border: 1px solid #ccc;
+            height: 200px;
         }
-        .full-preview {
-            margin: 0;
-            padding: 0;
-        }
-        .full-preview iframe {
-            height: 100vh;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -37,44 +36,19 @@
     <!-- Materialize JavaScript and dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-        function getQueryParams() {
-            const params = {};
-            window.location.search.substring(1).split("&").forEach(param => {
-                const [key, value] = param.split("=");
-                params[key] = decodeURIComponent(value || "");
-            });
-            return params;
-        }
-
         function previewHTML() {
             const htmlCode = document.getElementById('htmlInput').value;
             localStorage.setItem('htmlContent', htmlCode);
 
             // ポップアップウィンドウを開く
             const popupWindow = window.open(
-                window.location.pathname + "?viewhtml",
+                'html-view.html',
                 'popupWindow',
                 'width=800,height=600,scrollbars=yes,resizable=yes'
             );
 
             if (!popupWindow) {
                 alert('ポップアップウィンドウがブロックされました。ポップアップを許可してください。');
-            }
-        }
-
-        window.onload = function() {
-            const params = getQueryParams();
-            if (params.viewhtml !== undefined) {
-                document.body.classList.add('full-preview');
-                document.getElementById('editorSection').classList.add('hidden');
-
-                // iframeに直接HTMLを入れる
-                const iframe = document.createElement('iframe');
-                iframe.style.width = "100%";
-                iframe.style.height = "100vh";
-                iframe.style.border = "none";
-                iframe.srcdoc = localStorage.getItem('htmlContent');
-                document.body.appendChild(iframe);
             }
         }
     </script>
