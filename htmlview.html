@@ -26,26 +26,37 @@
 
         /* デバイスのテーマに基づくスタイル */
         @media (prefers-color-scheme: dark) {
-            body {
+            body:not(.force-light-theme) {
                 background-color: #121212;
                 color: #ffffff;
             }
-            textarea {
+            textarea:not(.force-light-theme) {
                 background-color: #333;
                 color: #fff;
                 border-color: #555;
             }
         }
         @media (prefers-color-scheme: light) {
-            body {
+            body:not(.force-light-theme) {
                 background-color: #ffffff;
                 color: #000000;
             }
-            textarea {
+            textarea:not(.force-light-theme) {
                 background-color: #fff;
                 color: #000;
                 border-color: #ccc;
             }
+        }
+
+        /* ホワイトテーマ固定 */
+        .force-light-theme {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+        .force-light-theme textarea {
+            background-color: #fff !important;
+            color: #000 !important;
+            border-color: #ccc !important;
         }
     </style>
 </head>
@@ -96,7 +107,7 @@
         window.onload = function() {
             const params = getQueryParams();
             if (params.viewhtml !== undefined) {
-                document.body.classList.add('full-preview');
+                document.body.classList.add('full-preview', 'force-light-theme');
                 document.querySelector('.container').classList.add('hidden');
 
                 // iframeに直接HTMLを入れる
