@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMLプレビュー</title>
+    <!-- Materialize CSS CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .textarea-container {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .full-preview {
+            margin: 0;
+            padding: 0;
+        }
+        .full-preview iframe {
+            height: 100vh;
+        }
+
+        /* デバイスのテーマに基づくスタイル */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #ffffff;
+            }
+            textarea {
+                background-color: #333;
+                color: #fff;
+                border-color: #555;
+            }
+        }
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            textarea {
+                background-color: #fff;
+                color: #000;
+                border-color: #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">HTMLプレビュー</h1>
+        <div class="row textarea-container">
+            <div class="input-field col s12">
+                <textarea id="htmlInput" class="materialize-textarea" placeholder="ここにHTMLコードを入力してください"></textarea>
+                <label for="htmlInput">HTMLコード</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 center-align">
+                <button class="btn waves-effect waves-light" onclick="previewHTML()">プレビュー</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        function getQueryParams() {
+            const params = {};
+            window.location.search.substring(1).split("&").forEach(param => {
+                const [key, value] = param.split("=");
+                params[key] = decodeURIComponent(value || "");
+            });
+            return params;
+        }
+
+        function previewHTML() {
+            const htmlCode = document.getElementById('htmlInput').value;
+            localStorage.setItem('htmlContent', htmlCode);
+
+            // ポップアップウィンドウを開く
+            const popupWindow = window.open(
+                window.location.pathname + "?viewhtml",
+                'popupWindow',
+                'width=800,height=600,scrollbars=yes,resizable=yes'
+            );
+
+            if (!popupWindow) {
+                M.toast({html: 'ポップアップウィンドウがブロックされました。ポップアップを許可してください。'});
+            }
+        }
+
+        window.onload = function() {
+            const params = getQueryParams();
+            if (params.viewhtml !== undefined) {
+                document.body.classList.add('full-preview');
+                document.querySelector('.container').classList.add('hidden');
+
+                // iframeに直接HTMLを入れる
+                const iframe = document.createElement('iframe');
+                iframe.style.width = "100%";
+                iframe.style.height = "100vh";
+                iframe.style.border = "none";
+                iframe.srcdoc = localStorage.getItem('htmlContent');
+                document.body.appendChild(iframe);
+            }
+        }
+    </script>
+</body>
+</html>
