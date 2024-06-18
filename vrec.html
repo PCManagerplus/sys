@@ -4,37 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ボイスレコーダー</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        #recordButton, #stopButton {
-            width: 50px;
-            height: 50px;
+        .record-button {
+            background-color: red !important;
             border-radius: 50%;
-            border: none;
-            cursor: pointer;
         }
-        #recordButton {
-            background-color: red;
-        }
-        #stopButton {
-            background-color: grey;
+        .stop-button {
+            background-color: grey !important;
             border-radius: 0;
+        }
+        #audioPlayer {
             display: none;
+            margin-top: 20px;
         }
     </style>
 </head>
-<body>
-    <h1>ボイスレコーダー</h1>
-    <button id="recordButton"></button>
-    <button id="stopButton"></button>
+<body class="container">
+    <h1 class="center-align">ボイスレコーダー</h1>
+    <div class="center-align">
+        <button id="recordButton" class="btn-floating btn-large waves-effect waves-light record-button">
+            <i class="material-icons">mic</i>
+        </button>
+        <button id="stopButton" class="btn-floating btn-large waves-effect waves-light stop-button" style="display: none;">
+            <i class="material-icons">stop</i>
+        </button>
+    </div>
 
-    <audio id="startSound" src="https://pcmanagerplus.github.io/media.web/Rec%20start.m4a"></audio>
-    <audio id="stopSound" src="https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a"></audio>
+    <audio id="startSound" src="start.mp3"></audio>
+    <audio id="stopSound" src="stop.mp3"></audio>
+    <audio id="audioPlayer" controls></audio>
 
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         let recordButton = document.getElementById('recordButton');
         let stopButton = document.getElementById('stopButton');
         let startSound = document.getElementById('startSound');
         let stopSound = document.getElementById('stopSound');
+        let audioPlayer = document.getElementById('audioPlayer');
         let mediaRecorder;
         let audioChunks = [];
 
@@ -52,7 +63,7 @@
 
             mediaRecorder.start();
             recordButton.style.display = 'none';
-            stopButton.style.display = 'block';
+            stopButton.style.display = 'inline-block';
         }
 
         function stopRecording() {
@@ -61,12 +72,12 @@
             mediaRecorder.onstop = () => {
                 let audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                 let audioUrl = URL.createObjectURL(audioBlob);
-                let audio = new Audio(audioUrl);
-                audio.play();
+                audioPlayer.src = audioUrl;
+                audioPlayer.style.display = 'block';
                 audioChunks = [];
             };
             stopButton.style.display = 'none';
-            recordButton.style.display = 'block';
+            recordButton.style.display = 'inline-block';
         }
     </script>
 </body>
