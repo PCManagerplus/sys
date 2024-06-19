@@ -34,8 +34,6 @@
         </button>
     </div>
 
-    <audio id="startSound" src="https://pcmanagerplus.github.io/media.web/Rec%20start.m4a"></audio>
-    <audio id="stopSound" src="https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a"></audio>
     <audio id="audioPlayer" controls></audio>
     <button id="exportButton" class="btn waves-effect waves-light">エクスポート</button>
 
@@ -44,21 +42,50 @@
     <script>
         let recordButton = document.getElementById('recordButton');
         let stopButton = document.getElementById('stopButton');
-        let startSound = document.getElementById('startSound');
-        let stopSound = document.getElementById('stopSound');
         let audioPlayer = document.getElementById('audioPlayer');
         let exportButton = document.getElementById('exportButton');
         let mediaRecorder;
         let audioChunks = [];
         let audioBlob;
 
+        // Web Audio APIのコンテキストを作成
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let startSoundBuffer, stopSoundBuffer;
+
+        // 音声ファイルを読み込む
+        async function loadSound(url) {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            return await audioContext.decodeAudioData(arrayBuffer);
+        }
+
+        // サウンドバッファを読み込む
+        loadSound('https://pcmanagerplus.github.io/media.web/Rec%20start.m4a').then(buffer => {
+            startSoundBuffer = buffer;
+        });
+        loadSound('https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a').then(buffer => {
+            stopSoundBuffer = buffer;
+        });
+
+        function playSound(buffer) {
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start(0);
+        }
+
         recordButton.addEventListener('click', startRecording);
         stopButton.addEventListener('click', stopRecording);
         exportButton.addEventListener('click', exportRecording);
 
         async function startRecording() {
-            startSound.play();
-            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            playSound(startSoundBuffer);
+            let stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    noiseSuppression: false,
+                    echoCancellation: false
+                }
+            });
             mediaRecorder = new MediaRecorder(stream);
 
             mediaRecorder.ondataavailable = (event) => {
@@ -74,7 +101,7 @@
 
         function stopRecording() {
             mediaRecorder.stop();
-            stopSound.play();
+            playSound(stopSoundBuffer);
             mediaRecorder.onstop = () => {
                 audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                 let audioUrl = URL.createObjectURL(audioBlob);
