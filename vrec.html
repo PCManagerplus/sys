@@ -17,7 +17,7 @@
             background-color: grey !important;
             border-radius: 0;
         }
-        #audioPlayer {
+        #audioPlayer, #exportButton {
             display: none;
             margin-top: 20px;
         }
@@ -37,6 +37,7 @@
     <audio id="startSound" src="https://pcmanagerplus.github.io/media.web/Rec%20start.m4a"></audio>
     <audio id="stopSound" src="https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a"></audio>
     <audio id="audioPlayer" controls></audio>
+    <button id="exportButton" class="btn waves-effect waves-light">エクスポート</button>
 
     <!-- Materialize JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -46,11 +47,14 @@
         let startSound = document.getElementById('startSound');
         let stopSound = document.getElementById('stopSound');
         let audioPlayer = document.getElementById('audioPlayer');
+        let exportButton = document.getElementById('exportButton');
         let mediaRecorder;
         let audioChunks = [];
+        let audioBlob;
 
         recordButton.addEventListener('click', startRecording);
         stopButton.addEventListener('click', stopRecording);
+        exportButton.addEventListener('click', exportRecording);
 
         async function startRecording() {
             startSound.play();
@@ -64,20 +68,32 @@
             mediaRecorder.start();
             recordButton.style.display = 'none';
             stopButton.style.display = 'inline-block';
+            audioPlayer.style.display = 'none';
+            exportButton.style.display = 'none';
         }
 
         function stopRecording() {
             mediaRecorder.stop();
             stopSound.play();
             mediaRecorder.onstop = () => {
-                let audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
                 let audioUrl = URL.createObjectURL(audioBlob);
                 audioPlayer.src = audioUrl;
                 audioPlayer.style.display = 'block';
+                exportButton.style.display = 'block';
                 audioChunks = [];
             };
             stopButton.style.display = 'none';
             recordButton.style.display = 'inline-block';
+        }
+
+        function exportRecording() {
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(audioBlob);
+            a.download = 'recording.mp3';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
