@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写真撮影</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        #camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        video, canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="camera-container">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div class="buttons">
+        <button id="snap" class="btn waves-effect waves-light">撮影</button>
+        <button id="preview" class="btn waves-effect waves-light">プレビュー</button>
+    </div>
+</div>
+
+<audio id="shutter-sound" src="https://pcmanagerplus.github.io/media.web/ChromeOS/Camera/%E3%82%B7%E3%83%A3%E3%83%83%E3%82%BF%E3%83%BC%E9%9F%B3.ogg" preload="auto"></audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const snapButton = document.getElementById('snap');
+    const previewButton = document.getElementById('preview');
+    const shutterSound = document.getElementById('shutter-sound');
+    const context = canvas.getContext('2d');
+    let imageData;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(error => {
+            console.error('カメラの起動に失敗しました:', error);
+        });
+
+    snapButton.addEventListener('click', () => {
+        shutterSound.play();
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        imageData = canvas.toDataURL('image/png');
+    });
+
+    previewButton.addEventListener('click', () => {
+        if (imageData) {
+            const previewWindow = window.open('pview.html', '_blank');
+            previewWindow.onload = function () {
+                previewWindow.document.body.innerHTML = `
+                    <div class="container">
+                        <img src="${imageData}" alt="Preview" style="max-width: 100%;">
+                        <br>
+                        <a href="${imageData}" download="photo.png" class="btn waves-effect waves-light">エクスポート</a>
+                    </div>`;
+            };
+        } else {
+            alert('まず写真を撮影してください。');
+        }
+    });
+</script>
+
+</body>
+</html>
