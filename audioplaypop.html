@@ -88,7 +88,8 @@
         async function startMic() {
             const constraints = {
                 audio: {
-                    deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined
+                    deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined,
+                    video: false // ここでvideoをfalseに設定
                 }
             };
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
