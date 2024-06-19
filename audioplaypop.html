@@ -89,13 +89,18 @@
             const constraints = {
                 audio: {
                     deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined,
-                    video: false // ここでvideoをfalseに設定
+                    sampleRate: 44100  // サンプリングレートを指定することで電話モードを回避
                 }
             };
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-            mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
-            mediaStreamSource.connect(audioContext.destination);
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+                mediaStreamSource.connect(audioContext.destination);
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                // エラー処理を追加する場合はここに記述する
+            }
         }
 
         // マイクを停止する
