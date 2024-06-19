@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音楽ファイルのバイブレーションとハプティクス</title>
+    <!-- Materialize CSS CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .file-field .btn, .file-path-wrapper {
+            margin-top: 20px;
+        }
+        audio {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>音楽ファイルのバイブレーションとハプティクス</h1>
+        <div class="file-field input-field">
+            <div class="btn">
+                <span>ファイルを選択</span>
+                <input type="file" id="audioFile" accept="audio/*">
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="音楽ファイルをアップロード">
+            </div>
+        </div>
+        <button id="playButton" class="btn waves-effect waves-light">再生</button>
+        <button id="toggleVibration" class="btn waves-effect waves-light">バイブレーション オン/オフ</button>
+        <audio id="audio" controls></audio>
+    </div>
+
+    <!-- Materialize JavaScript CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioFileInput = document.getElementById('audioFile');
+            const playButton = document.getElementById('playButton');
+            const toggleVibrationButton = document.getElementById('toggleVibration');
+            const audioElement = document.getElementById('audio');
+
+            let vibrationEnabled = false;
+
+            audioFileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const objectURL = URL.createObjectURL(file);
+                    audioElement.src = objectURL;
+                }
+            });
+
+            playButton.addEventListener('click', function() {
+                if (audioElement.paused) {
+                    audioElement.play();
+                } else {
+                    audioElement.pause();
+                }
+            });
+
+            toggleVibrationButton.addEventListener('click', function() {
+                vibrationEnabled = !vibrationEnabled;
+                M.toast({html: `バイブレーションは ${vibrationEnabled ? 'オン' : 'オフ'} です`});
+            });
+
+            audioElement.addEventListener('timeupdate', function() {
+                if (vibrationEnabled) {
+                    // 音楽の再生時間に応じたバイブレーションを設定
+                    navigator.vibrate([100, 200, 100]);
+                } else {
+                    navigator.vibrate(0);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
