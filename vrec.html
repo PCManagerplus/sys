@@ -21,8 +21,9 @@
             display: none;
             margin-top: 20px;
         }
-        .switch {
+        .radio-buttons {
             margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
@@ -37,11 +38,18 @@
         </button>
     </div>
 
-    <div class="center-align switch">
+    <div class="radio-buttons">
         <label>
-            ノイズキャンセリング
-            <input type="checkbox" id="noiseToggle">
-            <span class="lever"></span>
+            <input name="noiseOption" type="radio" value="off" checked />
+            <span>オフ</span>
+        </label>
+        <label>
+            <input name="noiseOption" type="radio" value="normal" />
+            <span>ノイズキャンセリング</span>
+        </label>
+        <label>
+            <input name="noiseOption" type="radio" value="high" />
+            <span>強力ノイズキャンセリング</span>
         </label>
     </div>
 
@@ -53,7 +61,7 @@
     <script>
         let recordButton = document.getElementById('recordButton');
         let stopButton = document.getElementById('stopButton');
-        let noiseToggle = document.getElementById('noiseToggle');
+        let noiseOptions = document.getElementsByName('noiseOption');
         let audioPlayer = document.getElementById('audioPlayer');
         let exportButton = document.getElementById('exportButton');
         let mediaRecorder;
@@ -92,12 +100,42 @@
 
         async function startRecording() {
             playSound(startSoundBuffer);
-            let stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    noiseSuppression: noiseToggle.checked,
-                    echoCancellation: noiseToggle.checked
-                }
-            });
+
+            let noiseOption = Array.from(noiseOptions).find(option => option.checked).value;
+            let constraints;
+
+            switch (noiseOption) {
+                case 'off':
+                    constraints = {
+                        audio: {
+                            noiseSuppression: false,
+                            echoCancellation: false
+                        }
+                    };
+                    break;
+                case 'normal':
+                    constraints = {
+                        audio: {
+                            noiseSuppression: true,
+                            echoCancellation: true
+                        }
+                    };
+                    break;
+                case 'high':
+                    constraints = {
+                        audio: {
+                            noiseSuppression: { ideal: true },
+                            echoCancellation: { ideal: true },
+                            advanced: [{
+                                noiseSuppression: { ideal: true },
+                                echoCancellation: { ideal: true }
+                            }]
+                        }
+                    };
+                    break;
+            }
+
+            let stream = await navigator.mediaDevices.getUserMedia(constraints);
             mediaRecorder = new MediaRecorder(stream);
 
             mediaRecorder.ondataavailable = (event) => {
