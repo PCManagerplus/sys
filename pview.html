@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写真プレビュー</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h4>写真プレビュー</h4>
+    <div id="preview-image"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const imageData = params.get('imageData');
+
+    if (imageData) {
+        document.getElementById('preview-image').innerHTML = `
+            <img src="${imageData}" alt="Preview" style="max-width: 100%;">
+            <br>
+            <a href="${imageData}" download="photo.png" class="btn waves-effect waves-light">エクスポート</a>
+        `;
+    } else {
+        alert('写真が見つかりませんでした。');
+    }
+</script>
+
+</body>
+</html>
