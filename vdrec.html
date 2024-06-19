@@ -57,7 +57,10 @@
 
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then(stream => {
-                video.srcObject = stream;
+                // 映像のみをvideo要素に表示
+                const videoStream = new MediaStream(stream.getVideoTracks());
+                video.srcObject = videoStream;
+                
                 mediaRecorder = new MediaRecorder(stream);
                 
                 mediaRecorder.ondataavailable = event => {
