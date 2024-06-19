@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画プレビュー</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>動画プレビュー</h3>
+        <video id="previewVideo" width="640" height="480" controls></video>
+        <a id="exportBtn" class="btn green waves-effect waves-light">
+            <i class="material-icons left">file_download</i>エクスポート
+        </a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const videoUrl = params.get('videoUrl');
+            const previewVideo = document.getElementById('previewVideo');
+            const exportBtn = document.getElementById('exportBtn');
+
+            if (videoUrl) {
+                previewVideo.src = videoUrl;
+            }
+
+            exportBtn.addEventListener('click', () => {
+                const a = document.createElement('a');
+                a.href = videoUrl;
+                a.download = 'video.mp4';
+                document.body.appendChild(a);
+                a.click();
+            });
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
