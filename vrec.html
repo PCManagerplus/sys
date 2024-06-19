@@ -21,6 +21,9 @@
             display: none;
             margin-top: 20px;
         }
+        .switch {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body class="container">
@@ -34,6 +37,14 @@
         </button>
     </div>
 
+    <div class="center-align switch">
+        <label>
+            ノイズキャンセリング
+            <input type="checkbox" id="noiseToggle">
+            <span class="lever"></span>
+        </label>
+    </div>
+
     <audio id="audioPlayer" controls></audio>
     <button id="exportButton" class="btn waves-effect waves-light">エクスポート</button>
 
@@ -42,6 +53,7 @@
     <script>
         let recordButton = document.getElementById('recordButton');
         let stopButton = document.getElementById('stopButton');
+        let noiseToggle = document.getElementById('noiseToggle');
         let audioPlayer = document.getElementById('audioPlayer');
         let exportButton = document.getElementById('exportButton');
         let mediaRecorder;
@@ -80,10 +92,10 @@
 
         async function startRecording() {
             playSound(startSoundBuffer);
-            let stream = await navigator.mediaDevices.getUserMedia({ 
+            let stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
-                    noiseSuppression: false,
-                    echoCancellation: false
+                    noiseSuppression: noiseToggle.checked,
+                    echoCancellation: noiseToggle.checked
                 }
             });
             mediaRecorder = new MediaRecorder(stream);
