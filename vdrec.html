@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画撮影</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>動画撮影</h3>
+        <video id="video" width="640" height="480" autoplay></video>
+        <div class="controls">
+            <a id="startBtn" class="btn waves-effect waves-light">
+                <i class="material-icons left">videocam</i>録画開始
+            </a>
+            <a id="stopBtn" class="btn red waves-effect waves-light">
+                <i class="material-icons left">stop</i>録画停止
+            </a>
+            <a id="previewBtn" class="btn blue waves-effect waves-light" style="display: none;">
+                <i class="material-icons left">preview</i>プレビュー
+            </a>
+        </div>
+        <div class="controls">
+            <label>
+                <input name="noiseCancellation" type="radio" value="off" checked />
+                <span>ノイズキャンセリングオフ</span>
+            </label>
+            <label>
+                <input name="noiseCancellation" type="radio" value="weak" />
+                <span>ノイズキャンセリング弱</span>
+            </label>
+            <label>
+                <input name="noiseCancellation" type="radio" value="strong" />
+                <span>ノイズキャンセリング強</span>
+            </label>
+        </div>
+    </div>
+    
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const video = document.getElementById('video');
+        let mediaRecorder;
+        let chunks = [];
+        let videoBlob;
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = event => {
+                    chunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    videoBlob = new Blob(chunks, { 'type': 'video/mp4' });
+                    chunks = [];
+                    previewBtn.style.display = 'block';
+                };
+            });
+
+        startBtn.addEventListener('click', () => {
+            const audio = new Audio('https://pcmanagerplus.github.io/media.web/Rec%20start.m4a');
+            audio.play();
+            audio.onended = () => {
+                mediaRecorder.start();
+            };
+        });
+
+        stopBtn.addEventListener('click', () => {
+            mediaRecorder.stop();
+            const audio = new Audio('https://pcmanagerplus.github.io/media.web/Rec%20stop.m4a');
+            audio.play();
+        });
+
+        previewBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(videoBlob);
+            window.open(`vview.html?videoUrl=${encodeURIComponent(url)}`, '_blank');
+        });
+
+        const noiseCancellationRadios = document.getElementsByName('noiseCancellation');
+        noiseCancellationRadios.forEach(radio => {
+            radio.addEventListener('change', event => {
+                const selectedValue = event.target.value;
+                console.log(`ノイズキャンセリングモード: ${selectedValue}`);
+                // ノイズキャンセリング設定の変更をここに実装
+            });
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
