@@ -29,6 +29,9 @@
             <a id="previewBtn" class="btn blue waves-effect waves-light" style="display: none;">
                 <i class="material-icons left">preview</i>プレビュー
             </a>
+            <a id="switchCameraBtn" class="btn orange waves-effect waves-light">
+                <i class="material-icons left">switch_video</i>カメラ切替
+            </a>
         </div>
         <div class="controls">
             <label>
@@ -50,29 +53,46 @@
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const previewBtn = document.getElementById('previewBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
         const video = document.getElementById('video');
         let mediaRecorder;
         let chunks = [];
         let videoBlob;
+        let currentStream;
+        let currentDeviceIndex = 0;
+        let devices = [];
 
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                // 映像のみをvideo要素に表示
-                const videoStream = new MediaStream(stream.getVideoTracks());
-                video.srcObject = videoStream;
-                
-                mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = event => {
-                    chunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = () => {
-                    videoBlob = new Blob(chunks, { 'type': 'video/mp4' });
-                    chunks = [];
-                    previewBtn.style.display = 'block';
-                };
+        async function getDevices() {
+            devices = (await navigator.mediaDevices.enumerateDevices()).filter(device => device.kind === 'videoinput');
+        }
+
+        async function switchCamera() {
+            if (devices.length > 1) {
+                currentDeviceIndex = (currentDeviceIndex + 1) % devices.length;
+                startCamera(devices[currentDeviceIndex].deviceId);
+            }
+        }
+
+        async function startCamera(deviceId) {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            currentStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { deviceId: deviceId ? { exact: deviceId } : undefined },
+                audio: true
             });
+            video.srcObject = new MediaStream(currentStream.getVideoTracks());
+
+            mediaRecorder = new MediaRecorder(currentStream);
+            mediaRecorder.ondataavailable = event => {
+                chunks.push(event.data);
+            };
+            mediaRecorder.onstop = () => {
+                videoBlob = new Blob(chunks, { 'type': 'video/mp4' });
+                chunks = [];
+                previewBtn.style.display = 'block';
+            };
+        }
 
         startBtn.addEventListener('click', () => {
             const audio = new Audio('https://pcmanagerplus.github.io/media.web/Rec%20start.m4a');
@@ -93,6 +113,8 @@
             window.open(`vview.html?videoUrl=${encodeURIComponent(url)}`, '_blank');
         });
 
+        switchCameraBtn.addEventListener('click', switchCamera);
+
         const noiseCancellationRadios = document.getElementsByName('noiseCancellation');
         noiseCancellationRadios.forEach(radio => {
             radio.addEventListener('change', event => {
@@ -101,6 +123,9 @@
                 // ノイズキャンセリング設定の変更をここに実装
             });
         });
+
+        getDevices().then(() => startCamera(devices[currentDeviceIndex]?.deviceId));
+
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
