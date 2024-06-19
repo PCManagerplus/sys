@@ -6,6 +6,8 @@
     <title>放送システム</title>
     <!-- Materialize CSS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- 電話番号の自動検出を無効化 -->
+    <meta name="format-detection" content="telephone=no">
 </head>
 <body>
     <div class="container">
@@ -92,25 +94,12 @@
                 }
             };
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-            mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
-
-            // 出力デバイスに接続する
-            let destinationNode = audioContext.createMediaStreamDestination();
-            mediaStreamSource.connect(destinationNode);
-
-            // 出力デバイスの選択を反映
-            let audioOutputDeviceId = audioOutputSelect.value;
-            if (audioOutputDeviceId) {
-                await mediaStream.getAudioTracks().forEach(track => {
-                    let audio = new Audio();
-                    audio.setSinkId(audioOutputDeviceId).then(() => {
-                        audio.srcObject = new MediaStream([track]);
-                        audio.play();
-                    }).catch(err => {
-                        console.error('Error setting sink ID:', err);
-                    });
-                });
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+                mediaStreamSource.connect(audioContext.destination);
+            } catch (err) {
+                console.error('マイクの取得に失敗しました:', err);
             }
         }
 
@@ -133,7 +122,7 @@
                 audio.setSinkId(selectedDeviceId).then(() => {
                     audio.play();
                 }).catch(err => {
-                    console.error('Error setting sink ID:', err);
+                    console.error('出力デバイスの設定に失敗しました:', err);
                     audio.play(); // デバイス指定に失敗した場合でも音を出す
                 });
             } else {
@@ -161,7 +150,7 @@
             let elems = document.querySelectorAll('select');
             M.FormSelect.init(elems);
         }).catch(err => {
-            console.error('Error enumerating devices:', err);
+            console.error('デバイスの列挙に失敗しました:', err);
         });
     </script>
 </body>
