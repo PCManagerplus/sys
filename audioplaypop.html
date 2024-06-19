@@ -120,15 +120,20 @@
             let audio = new Audio(url);
             let selectedDeviceId = audioOutputSelect.value;
 
-            if (selectedDeviceId) {
-                audio.setSinkId(selectedDeviceId).then(() => {
-                    audio.play();
-                }).catch(err => {
-                    console.error('出力デバイスの設定に失敗しました:', err);
-                    audio.play(); // デバイス指定に失敗した場合でも音を出す
-                });
+            // マイクがオンになっている場合、一時的にマイクの音声を停止する
+            if (micToggle.checked) {
+                stopMic();
+                setTimeout(() => {
+                    // 一時停止後に音声を再生する
+                    audio.play().catch(error => {
+                        console.error('音声の再生中にエラーが発生しました:', error);
+                    });
+                }, 500); // 0.5秒の待機時間を設定していますが、必要に応じて調整してください
             } else {
-                audio.play();
+                // マイクがオフの場合はそのまま音声を再生する
+                audio.play().catch(error => {
+                    console.error('音声の再生中にエラーが発生しました:', error);
+                });
             }
         }
 
