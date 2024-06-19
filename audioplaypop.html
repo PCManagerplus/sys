@@ -90,7 +90,9 @@
         async function startMic() {
             const constraints = {
                 audio: {
-                    deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined
+                    deviceId: audioInputSelect.value ? { exact: audioInputSelect.value } : undefined,
+                    autoGainControl: false, // 自動ゲイン制御を無効化
+                    noiseSuppression: false // ノイズキャンセリングを無効化
                 }
             };
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
