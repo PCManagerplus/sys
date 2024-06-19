@@ -20,6 +20,12 @@
 <body>
 
 <div class="container" id="camera-container">
+    <div>
+        <label>
+            <input type="checkbox" id="toggle-camera" />
+            <span>カメラ切り替え</span>
+        </label>
+    </div>
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas" style="display:none;"></canvas>
     <div class="buttons">
@@ -36,17 +42,40 @@
     const canvas = document.getElementById('canvas');
     const snapButton = document.getElementById('snap');
     const previewButton = document.getElementById('preview');
+    const toggleCameraCheckbox = document.getElementById('toggle-camera');
     const shutterSound = document.getElementById('shutter-sound');
     const context = canvas.getContext('2d');
     let imageData;
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            video.srcObject = stream;
-        })
-        .catch(error => {
-            console.error('カメラの起動に失敗しました:', error);
-        });
+    let currentStream;
+
+    function startCamera() {
+        const constraints = {
+            video: {
+                facingMode: toggleCameraCheckbox.checked ? 'environment' : 'user'
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                video.srcObject = stream;
+                currentStream = stream;
+            })
+            .catch(error => {
+                console.error('カメラの起動に失敗しました:', error);
+            });
+    }
+
+    toggleCameraCheckbox.addEventListener('change', () => {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+        startCamera();
+    });
+
+    startCamera();
 
     snapButton.addEventListener('click', () => {
         shutterSound.play();
