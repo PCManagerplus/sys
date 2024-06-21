@@ -25,6 +25,15 @@
             margin-top: 20px;
             text-align: center;
         }
+        .meter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .meter canvas {
+            border: 1px solid #000;
+        }
     </style>
 </head>
 <body class="container">
@@ -51,6 +60,11 @@
             <input name="noiseOption" type="radio" value="high" />
             <span>強力ノイズキャンセリング</span>
         </label>
+    </div>
+
+    <div class="meter">
+        <canvas id="leftMeter" width="150" height="300"></canvas>
+        <canvas id="rightMeter" width="150" height="300"></canvas>
     </div>
 
     <audio id="audioPlayer" controls></audio>
@@ -109,7 +123,8 @@
                     constraints = {
                         audio: {
                             noiseSuppression: false,
-                            echoCancellation: false
+                            echoCancellation: false,
+                            channelCount: 2
                         }
                     };
                     break;
@@ -117,7 +132,8 @@
                     constraints = {
                         audio: {
                             noiseSuppression: true,
-                            echoCancellation: true
+                            echoCancellation: true,
+                            channelCount: 2
                         }
                     };
                     break;
@@ -126,6 +142,7 @@
                         audio: {
                             noiseSuppression: { ideal: true },
                             echoCancellation: { ideal: true },
+                            channelCount: 2,
                             advanced: [{
                                 noiseSuppression: { ideal: true },
                                 echoCancellation: { ideal: true }
@@ -137,6 +154,51 @@
 
             let stream = await navigator.mediaDevices.getUserMedia(constraints);
             mediaRecorder = new MediaRecorder(stream);
+
+            // ビジュアライザーの設定
+            const source = audioContext.createMediaStreamSource(stream);
+            const analyser = audioContext.createAnalyser();
+            source.connect(analyser);
+
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            const canvasL = document.getElementById('leftMeter');
+            const canvasR = document.getElementById('rightMeter');
+            const canvasCtxL = canvasL.getContext('2d');
+            const canvasCtxR = canvasR.getContext('2d');
+
+            function drawMeter() {
+                requestAnimationFrame(drawMeter);
+
+                analyser.getByteFrequencyData(dataArray);
+
+                canvasCtxL.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                canvasCtxL.fillRect(0, 0, canvasL.width, canvasL.height);
+
+                canvasCtxR.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                canvasCtxR.fillRect(0, 0, canvasR.width, canvasR.height);
+
+                let sumL = 0;
+                let sumR = 0;
+
+                for (let i = 0; i < bufferLength / 2; i++) {
+                    sumL += dataArray[i];
+                    sumR += dataArray[i + bufferLength / 2];
+                }
+
+                let avgL = sumL / (bufferLength / 2);
+                let avgR = sumR / (bufferLength / 2);
+
+                canvasCtxL.fillStyle = 'red';
+                canvasCtxL.fillRect(0, canvasL.height - avgL * 2, canvasL.width, avgL * 2);
+
+                canvasCtxR.fillStyle = 'red';
+                canvasCtxR.fillRect(0, canvasR.height - avgR * 2, canvasR.width, avgR * 2);
+            }
+
+            drawMeter();
 
             mediaRecorder.ondataavailable = (event) => {
                 audioChunks.push(event.data);
@@ -172,6 +234,20 @@
             a.click();
             document.body.removeChild(a);
         }
+        
+        // 電話モードの無効化
+        function preventTelephoneMode() {
+            if (navigator.userAgent.match(/Android/i)) {
+                // Android 端末の特定
+                let metaTag = document.createElement('meta');
+                metaTag.name = 'viewport';
+                metaTag.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+                document.getElementsByTagName('head')[0].appendChild(metaTag);
+            }
+        }
+
+        preventTelephoneMode();
+
     </script>
 </body>
 </html>
