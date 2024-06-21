@@ -25,13 +25,13 @@
             max-width: 600px;
             width: 100%;
             margin: 20px;
+            text-align: center;
         }
 
         .card-header, .card-footer {
             padding: 16px;
             background: #6200ea;
             color: white;
-            text-align: center;
         }
 
         .card-content {
@@ -42,6 +42,7 @@
             position: relative;
             padding-bottom: 56.25%; /* 16:9 */
             height: 0;
+            margin-top: 20px;
         }
 
         .video-container iframe {
@@ -52,6 +53,34 @@
             height: 100%;
             transform: scaleX(-1);
         }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .input-container input {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .input-container button {
+            padding: 8px 16px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #3700b3;
+        }
     </style>
 </head>
 <body>
@@ -61,14 +90,45 @@
             反転したYouTube動画
         </div>
         <div class="card-content">
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="input-container">
+                <input type="text" id="youtubeUrl" placeholder="YouTubeのURLを入力">
+                <button onclick="loadVideo()">反転</button>
+            </div>
+            <div class="video-container" id="videoContainer">
+                <!-- ここに反転された動画が表示されます -->
             </div>
         </div>
         <div class="card-footer">
             マテリアルデザインの例
         </div>
     </div>
+
+    <script>
+        function extractVideoId(url) {
+            const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)?([^&\n?#]+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+        function loadVideo() {
+            const url = document.getElementById('youtubeUrl').value;
+            const videoId = extractVideoId(url);
+            if (videoId) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                iframe.frameBorder = '0';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                iframe.allowFullscreen = true;
+                iframe.style.transform = 'scaleX(-1)';
+
+                const videoContainer = document.getElementById('videoContainer');
+                videoContainer.innerHTML = '';
+                videoContainer.appendChild(iframe);
+            } else {
+                alert('有効なYouTubeのURLを入力してください');
+            }
+        }
+    </script>
 
 </body>
 </html>
