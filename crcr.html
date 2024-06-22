@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>時計と時報</title>
+  <!-- Materialize CSS CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* 画面の高さいっぱいに表示 */
+    }
+    #clock {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    .custom-select {
+      display: inline-block;
+      margin-top: 20px;
+    }
+    .custom-time {
+      display: none;
+      margin-top: 10px;
+    }
+    .btn-preview {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="clock"></div>
+
+  <div class="custom-select">
+    <label>音声を選択:</label>
+    <select id="audioSelect">
+      <option value="https://pcmanagerplus.github.io/media.web/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A0/%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%E3%83%9F%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%BC-%E9%95%B7%E3%81%84.mp3">ウエストミンスター-長い</option>
+      <option value="https://pcmanagerplus.github.io/media.web/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A0/%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%E3%83%9F%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%BC-%E7%9F%AD%E3%81%84.mp3">ウエストミンスター-短い</option>
+      <option value="https://pcmanagerplus.github.io/media.web/Pendulum_Clock-Chime04-06(Long).mp3">振り子時計1</option>
+      <option value="https://pcmanagerplus.github.io/media.web/Pendulum_Clock-Chime02-06(Long)[1].mp3">振り子時計2</option>
+    </select>
+  </div>
+
+  <button class="btn waves-effect waves-light btn-preview" onclick="previewAudio()">プレビュー</button>
+
+  <div class="custom-select">
+    <label>音を鳴らさない時間:</label>
+    <select id="muteSelect">
+      <option value="19-10">19:00から翌10:00まで音無し</option>
+      <option value="custom">カスタム</option>
+    </select>
+  </div>
+
+  <div id="customTime" class="custom-time">
+    <label for="muteStartHour">音無し開始時間:</label>
+    <input type="time" id="muteStartHour" name="muteStartHour">
+    <label for="muteEndHour">音無し終了時間:</label>
+    <input type="time" id="muteEndHour" name="muteEndHour">
+  </div>
+
+  <!-- Materialize CSS and JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var elems = document.querySelectorAll('select');
+      M.FormSelect.init(elems);
+
+      document.getElementById('muteSelect').addEventListener('change', function() {
+        if (this.value === 'custom') {
+          document.getElementById('customTime').style.display = 'block';
+        } else {
+          document.getElementById('customTime').style.display = 'none';
+        }
+      });
+    });
+
+    function previewAudio() {
+      const audioSelect = document.getElementById('audioSelect');
+      const selectedAudio = audioSelect.value;
+      const audio = new Audio(selectedAudio);
+      audio.play();
+    }
+
+    // 時報を鳴らす時間帯の設定
+    const chimeHours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23];
+
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      const formattedHours = hours.toString().padStart(2, '0');
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      const formattedSeconds = seconds.toString().padStart(2, '0');
+
+      const currentTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+      document.getElementById('clock').textContent = currentTime;
+
+      const muteSelect = document.getElementById('muteSelect').value;
+      let muteStart = 19;
+      let muteEnd = 10;
+
+      if (muteSelect === 'custom') {
+        muteStart = parseInt(document.getElementById('muteStartHour').value.split(':')[0]);
+        muteEnd = parseInt(document.getElementById('muteEndHour').value.split(':')[0]);
+      }
+
+      const isMuteTime = (hours >= muteStart || hours < muteEnd);
+
+      // 時報のチェックと鳴らす処理
+      if (!isMuteTime && chimeHours.includes(hours) && minutes === 0 && seconds === 0) {
+        playChime(hours); // 音を鳴らす関数を呼び出す
+      }
+    }
+
+    function playChime(hour) {
+      // 選択された音声ファイルの取得
+      const audioSelect = document.getElementById('audioSelect');
+      const selectedAudio = audioSelect.value;
+      const audio = new Audio(selectedAudio);
+      audio.play();
+
+      // ポップアップメッセージの表示
+      M.toast({html: `${hour}:00になりました`, displayLength: 4000}); // 4秒間表示
+    }
+
+    // 1秒ごとに時計を更新する
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
