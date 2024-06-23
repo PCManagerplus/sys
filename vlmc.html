@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>騒音計</title>
+    <style>
+        /* Reset default browser styles */
+        body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #212121;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Buttons */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #6200ea;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .button:hover {
+            background-color: #3700b3;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        /* Cards */
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2), 0px 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        h2 {
+            font-size: 2em;
+        }
+
+        h3 {
+            font-size: 1.75em;
+        }
+
+        h4 {
+            font-size: 1.5em;
+        }
+
+        h5 {
+            font-size: 1.25em;
+        }
+
+        h6 {
+            font-size: 1em;
+        }
+
+        /* Text fields */
+        .text-field {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .text-field input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        .text-field input:focus {
+            border-color: #6200ea;
+            outline: none;
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 56px;
+            height: 56px;
+            background-color: #6200ea;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 24px;
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .fab:hover {
+            background-color: #3700b3;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Additional styling for the canvas */
+        canvas {
+            border: 1px solid black;
+            background: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>騒音計</h1>
+    <div class="card">
+        <canvas id="oscilloscope" width="600" height="200"></canvas>
+    </div>
+    <button class="button" onclick="start()">開始</button>
+    <button class="button" onclick="stop()">停止</button>
+    <script>
+        let audioContext;
+        let analyser;
+        let microphone;
+        let javascriptNode;
+        let isRunning = false;
+        const canvas = document.getElementById('oscilloscope');
+        const canvasContext = canvas.getContext('2d');
+
+        function drawWaveform(dataArray) {
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            canvasContext.lineWidth = 2;
+            canvasContext.strokeStyle = 'black';
+            canvasContext.beginPath();
+
+            let sliceWidth = canvas.width * 1.0 / dataArray.length;
+            let x = 0;
+
+            for (let i = 0; i < dataArray.length; i++) {
+                let v = dataArray[i] / 128.0;
+                let y = v * canvas.height / 2;
+
+                if (i === 0) {
+                    canvasContext.moveTo(x, y);
+                } else {
+                    canvasContext.lineTo(x, y);
+                }
+
+                x += sliceWidth;
+            }
+
+            canvasContext.lineTo(canvas.width, canvas.height / 2);
+            canvasContext.stroke();
+        }
+
+        function start() {
+            if (isRunning) return;
+
+            isRunning = true;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            let bufferLength = analyser.fftSize;
+            let dataArray = new Uint8Array(bufferLength);
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+                javascriptNode.onaudioprocess = () => {
+                    analyser.getByteTimeDomainData(dataArray);
+                    drawWaveform(dataArray);
+                };
+
+                microphone.connect(javascriptNode);
+                javascriptNode.connect(audioContext.destination);
+            }).catch(err => {
+                console.error('Error accessing microphone: ', err);
+            });
+        }
+
+        function stop() {
+            if (!isRunning) return;
+
+            isRunning = false;
+            microphone.disconnect();
+            javascriptNode.disconnect();
+            audioContext.close();
+        }
+    </script>
+</body>
+</html>
