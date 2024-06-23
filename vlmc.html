@@ -54,6 +54,8 @@
             margin: 20px;
             padding: 20px;
             transition: box-shadow 0.3s;
+            width: 90%;
+            max-width: 1000px;
         }
 
         .card:hover {
@@ -140,13 +142,15 @@
             border: 1px solid black;
             background: white;
             border-radius: 8px;
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
     <h1>騒音計</h1>
     <div class="card">
-        <canvas id="oscilloscope" width="600" height="200"></canvas>
+        <canvas id="oscilloscope"></canvas>
     </div>
     <button class="button" onclick="start()">開始</button>
     <button class="button" onclick="stop()">停止</button>
@@ -158,6 +162,14 @@
         let isRunning = false;
         const canvas = document.getElementById('oscilloscope');
         const canvasContext = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();  // Initial call to set canvas size
 
         function drawWaveform(dataArray) {
             canvasContext.clearRect(0, 0, canvas.width, canvas.height);
