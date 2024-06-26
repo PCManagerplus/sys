@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DesTool</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/materia@1.0.0/dist/css/materia.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
         #clock {
             font-size: 24px;
@@ -17,42 +17,47 @@
         .container {
             margin-top: 20px;
         }
+        .center-align {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button class="button primary">リンクボタン1</button>
-        <button class="button primary">リンクボタン2</button>
-        <button class="button primary">リンクボタン3</button>
-        <button class="button primary">リンクボタン4</button>
-        <button class="button primary">リンクボタン5</button>
-        <button class="button primary">リンクボタン6</button>
-        <button class="button primary">リンクボタン7</button>
-        <button class="button primary">リンクボタン8</button>
+    <div class="container center-align">
+        <button class="btn waves-effect waves-light">リンクボタン1</button>
+        <button class="btn waves-effect waves-light">リンクボタン2</button>
+        <button class="btn waves-effect waves-light">リンクボタン3</button>
+        <button class="btn waves-effect waves-light">リンクボタン4</button>
+        <button class="btn waves-effect waves-light">リンクボタン5</button>
+        <button class="btn waves-effect waves-light">リンクボタン6</button>
+        <button class="btn waves-effect waves-light">リンクボタン7</button>
+        <button class="btn waves-effect waves-light">リンクボタン8</button>
     </div>
 
     <div class="container">
         <form action="https://www.google.com/search" method="get" target="_blank" class="form">
-            <div class="form-group">
-                <input type="text" name="q" placeholder="Google検索ボックス" class="input">
+            <div class="input-field">
+                <input type="text" name="q" id="searchBox" placeholder="Google検索ボックス">
+                <label for="searchBox">Google検索ボックス</label>
             </div>
-            <button type="submit" class="button secondary">検索</button>
+            <button type="submit" class="btn waves-effect waves-light">検索</button>
         </form>
     </div>
 
     <div class="container">
-        <div class="form-group">
-            <input type="text" id="linkInput" placeholder="リンク入力ボックス" class="input">
+        <div class="input-field">
+            <input type="text" id="linkInput" placeholder="リンク入力ボックス">
+            <label for="linkInput">リンク入力ボックス</label>
         </div>
-        <button onclick="accessLink()" class="button secondary">アクセス</button>
+        <button onclick="accessLink()" class="btn waves-effect waves-light">アクセス</button>
     </div>
 
-    <div id="clock" class="container"></div>
-    <div id="date" class="container"></div>
+    <div id="clock" class="container center-align"></div>
+    <div id="date" class="container center-align"></div>
 
-    <div class="container">
+    <div class="container center-align">
         <p>PCManagerPlus in Github</p>
-        <p1>DesTool</p1>
+        <p>DesTool</p>
     </div>
 
     <script>
@@ -81,5 +86,6 @@
         setInterval(updateTime, 1000);
         updateTime();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
