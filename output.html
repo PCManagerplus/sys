@@ -6,6 +6,12 @@
     <title>メッセージ受信</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style id="theme-style">
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,20 +24,65 @@
                         <p id="received-message">ここにメッセージが表示されます</p>
                     </div>
                     <div class="card-action">
+                        <div class="switch">
+                            <label>
+                                読み上げオフ
+                                <input type="checkbox" id="speech-toggle">
+                                <span class="lever"></span>
+                                読み上げオン
+                            </label>
+                        </div>
                         <button class="btn blue waves-effect waves-light" onclick="speakMessage()">
                             読み上げ
                             <i class="material-icons right">volume_up</i>
                         </button>
+                        <div class="switch">
+                            <label>
+                                ホワイトテーマ
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="lever"></span>
+                                ブラックテーマ
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = localStorage.getItem('message');
+            if (message) {
+                document.getElementById('received-message').innerText = message;
+            }
+
+            document.getElementById('theme-toggle').addEventListener('change', function() {
+                const themeStyle = document.getElementById('theme-style');
+                if (this.checked) {
+                    themeStyle.innerHTML = `
+                        body {
+                            background-color: #000000;
+                            color: #ffffff;
+                        }
+                    `;
+                } else {
+                    themeStyle.innerHTML = `
+                        body {
+                            background-color: #ffffff;
+                            color: #000000;
+                        }
+                    `;
+                }
+            });
+        });
+
         function speakMessage() {
-            const message = document.getElementById('received-message').innerText;
-            const speech = new SpeechSynthesisUtterance(message);
-            speechSynthesis.speak(speech);
+            const speechToggle = document.getElementById('speech-toggle');
+            if (speechToggle.checked) {
+                const message = document.getElementById('received-message').innerText;
+                const speech = new SpeechSynthesisUtterance(message);
+                speechSynthesis.speak(speech);
+            }
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
