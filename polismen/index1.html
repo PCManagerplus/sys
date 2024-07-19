@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康チェック表</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        .header {
+            background-color: #03A9F4; /* 水色 */
+            padding: 10px 20px; /* テキストの左寄せ */
+            color: white;
+            font-size: 24px; /* テキストサイズを調整 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    健康チェック表
+</div>
+
+<div class="container">
+    <div id="form-container">
+        <div class="row" id="form-1">
+            <div class="input-field col s3">
+                <input type="text" id="name-1" class="validate">
+                <label for="name-1">名前</label>
+            </div>
+            <div class="input-field col s2">
+                <input type="text" id="temperature-1" class="validate">
+                <label for="temperature-1">体温 (℃)</label>
+            </div>
+            <div class="input-field col s3">
+                <select id="health-status-1">
+                    <option value="" disabled selected>選択してください</option>
+                    <option value="正常">正常</option>
+                    <option value="異常">異常</option>
+                </select>
+                <label for="health-status-1">健康状態</label>
+            </div>
+            <div class="input-field col s4">
+                <input type="text" id="details-1" class="validate">
+                <label for="details-1">詳細</label>
+            </div>
+        </div>
+    </div>
+    <a class="btn-floating btn-large waves-effect waves-light blue" onclick="addForm(); playSound();"><i class="material-icons">add</i></a>
+    <button class="btn waves-effect waves-light" onclick="exportToTxt(); playSound();">エクスポート</button>
+</div>
+
+<audio id="button-sound" src="see.mp3" preload="auto"></audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        M.FormSelect.init(document.querySelectorAll('select'));
+    });
+
+    let formCount = 1;
+
+    function addForm() {
+        formCount++;
+        const formContainer = document.getElementById('form-container');
+        const newForm = document.createElement('div');
+        newForm.classList.add('row');
+        newForm.id = 'form-' + formCount;
+        newForm.innerHTML = `
+            <div class="input-field col s3">
+                <input type="text" id="name-${formCount}" class="validate">
+                <label for="name-${formCount}">名前</label>
+            </div>
+            <div class="input-field col s2">
+                <input type="text" id="temperature-${formCount}" class="validate">
+                <label for="temperature-${formCount}">体温 (℃)</label>
+            </div>
+            <div class="input-field col s3">
+                <select id="health-status-${formCount}">
+                    <option value="" disabled selected>選択してください</option>
+                    <option value="正常">正常</option>
+                    <option value="異常">異常</option>
+                </select>
+                <label for="health-status-${formCount}">健康状態</label>
+            </div>
+            <div class="input-field col s4">
+                <input type="text" id="details-${formCount}" class="validate">
+                <label for="details-${formCount}">詳細</label>
+            </div>
+        `;
+        formContainer.appendChild(newForm);
+        M.FormSelect.init(document.querySelectorAll('select'));
+    }
+
+    function exportToTxt() {
+        let data = '';
+        for (let i = 1; i <= formCount; i++) {
+            const name = document.getElementById(`name-${i}`).value;
+            const temperature = document.getElementById(`temperature-${i}`).value;
+            const healthStatus = document.getElementById(`health-status-${i}`).value;
+            const details = document.getElementById(`details-${i}`).value;
+
+            if (name || temperature || healthStatus || details) {
+                data += `名前: ${name}\n体温: ${temperature}℃\n健康状態: ${healthStatus}\n詳細: ${details}\n\n`;
+            }
+        }
+
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+        const filename = `健康状態(${formattedDate}).txt`;
+
+        const blob = new Blob([data], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+    }
+
+    function playSound() {
+        const sound = document.getElementById('button-sound');
+        sound.play();
+    }
+</script>
+
+</body>
+</html>
