@@ -38,6 +38,14 @@
 </head>
 <body class="container">
     <h1 class="center-align">ボイスレコーダー</h1>
+    
+    <div class="center-align">
+        <label for="micSelect">マイクを選択:</label>
+        <select id="micSelect" class="browser-default">
+            <option value="" disabled selected>マイクを選択してください</option>
+        </select>
+    </div>
+
     <div class="center-align">
         <button id="recordButton" class="btn-floating btn-large waves-effect waves-light record-button">
             <i class="material-icons">mic</i>
@@ -78,9 +86,11 @@
         let noiseOptions = document.getElementsByName('noiseOption');
         let audioPlayer = document.getElementById('audioPlayer');
         let exportButton = document.getElementById('exportButton');
+        let micSelect = document.getElementById('micSelect');
         let mediaRecorder;
         let audioChunks = [];
         let audioBlob;
+        let currentStream;
 
         // Web Audio APIのコンテキストを作成
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -108,6 +118,24 @@
             source.start(0);
         }
 
+        // マイクのリストを取得してドロップダウンに追加
+        async function getMicrophones() {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const mics = devices.filter(device => device.kind === 'audioinput');
+            mics.forEach(mic => {
+                const option = document.createElement('option');
+                option.value = mic.deviceId;
+                option.text = mic.label || `マイク ${mic.deviceId}`;
+                micSelect.appendChild(option);
+            });
+        }
+
+        micSelect.addEventListener('change', () => {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+        });
+
         recordButton.addEventListener('click', startRecording);
         stopButton.addEventListener('click', stopRecording);
         exportButton.addEventListener('click', exportRecording);
@@ -116,47 +144,36 @@
             playSound(startSoundBuffer);
 
             let noiseOption = Array.from(noiseOptions).find(option => option.checked).value;
-            let constraints;
+            let selectedMic = micSelect.value;
+            let constraints = {
+                audio: {
+                    deviceId: selectedMic ? { exact: selectedMic } : undefined,
+                    noiseSuppression: false,
+                    echoCancellation: false,
+                    channelCount: 2
+                }
+            };
 
             switch (noiseOption) {
-                case 'off':
-                    constraints = {
-                        audio: {
-                            noiseSuppression: false,
-                            echoCancellation: false,
-                            channelCount: 2
-                        }
-                    };
-                    break;
                 case 'normal':
-                    constraints = {
-                        audio: {
-                            noiseSuppression: true,
-                            echoCancellation: true,
-                            channelCount: 2
-                        }
-                    };
+                    constraints.audio.noiseSuppression = true;
+                    constraints.audio.echoCancellation = true;
                     break;
                 case 'high':
-                    constraints = {
-                        audio: {
-                            noiseSuppression: { ideal: true },
-                            echoCancellation: { ideal: true },
-                            channelCount: 2,
-                            advanced: [{
-                                noiseSuppression: { ideal: true },
-                                echoCancellation: { ideal: true }
-                            }]
-                        }
-                    };
+                    constraints.audio.noiseSuppression = { ideal: true };
+                    constraints.audio.echoCancellation = { ideal: true };
+                    constraints.audio.advanced = [{
+                        noiseSuppression: { ideal: true },
+                        echoCancellation: { ideal: true }
+                    }];
                     break;
             }
 
-            let stream = await navigator.mediaDevices.getUserMedia(constraints);
-            mediaRecorder = new MediaRecorder(stream);
+            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+            mediaRecorder = new MediaRecorder(currentStream);
 
             // ビジュアライザーの設定
-            const source = audioContext.createMediaStreamSource(stream);
+            const source = audioContext.createMediaStreamSource(currentStream);
             const analyser = audioContext.createAnalyser();
             source.connect(analyser);
 
@@ -234,7 +251,10 @@
             a.click();
             document.body.removeChild(a);
         }
-        
+
+        // マイクの取得をページロード時に実行
+        getMicrophones();
+
         // 電話モードの無効化
         function preventTelephoneMode() {
             if (navigator.userAgent.match(/Android/i)) {
@@ -247,7 +267,6 @@
         }
 
         preventTelephoneMode();
-
     </script>
 </body>
 </html>
