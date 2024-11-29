@@ -40,6 +40,10 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        /* Android 12風ボタン */
+        .btn-custom {
+            border-radius: 16px; /* 角を丸くする */
+        }
     </style>
 </head>
 <body>
@@ -50,7 +54,8 @@
                 <textarea id="htmlInput" class="materialize-textarea" placeholder="ここにHTMLコードを入力してください"></textarea>
             </div>
             <div class="col s12 center-align">
-                <button class="btn waves-effect waves-light" onclick="previewHTML()">プレビュー</button>
+                <!-- Android 12風ボタン -->
+                <button class="btn waves-effect waves-light btn-custom" onclick="previewHTML()">プレビュー</button>
             </div>
         </div>
     </div>
